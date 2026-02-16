@@ -1,25 +1,36 @@
-const http = require("http");
-
-const server = http.createServer((req, res) => {
-
-    const url = req.url;
-
-    if (url === "/") {
-        res.write("Home Page");
-    } 
-    else if (url === "/about") {
-        res.write("About Page");
-    } 
-    else if (url === "/contact") {
-        res.write("Contact Page");
-    } 
-    else {
-        res.write("Page not found");
+import http from "http";
+import os from "os";
+const serverr=http.createServer((req,res)=>{
+    const url=req.url;
+    const method=req.method;
+    if(url=="/" && method=="GET"){
+        res.end("HomePage");
     }
-
-    res.end();
-});
-
-server.listen(4001, () => {
-    console.log("Server is running on port 4001");
-});
+    else if(url=="/contact" && method=="GET"){
+        res.end("ContactPage");
+    }
+    else if(url=="/system" && method=="GET"){
+        const sysdata={
+            platform:os.platform(),
+            Arch:os.arch(),
+            CPUlength:os.cpus().length,
+            totalMemory:os.totalmem(),
+            freeMemory:os.freemem()
+        }
+        res.write("System Info");
+        res.end(JSON.stringify(sysdata));
+    }
+    else if(url=="/senddata" && method=="POST"){
+        let body="";
+        req.on("data",(chunk)=>{
+            body=body+chunk;
+        })
+        req.on("end",()=>{
+            console.log(body,"Data send successfully");
+            res.end(body);
+        })
+    }
+})
+serverr.listen(5001,()=>{
+    console.log(`server is running on port 5001`)
+})
